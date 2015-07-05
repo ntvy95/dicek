@@ -1,0 +1,10 @@
+services:
+    koutogima.postcrashprotection.event.main_listener:
+        class: koutogima\postcrashprotection\event\main_listener
+        arguments:
+            - @user
+            - @template
+            - @dbal.conn
+            - %tables.users%
+        tags:
+            - { name: event.listener }

@@ -1,0 +1,26 @@
+<!-- Post Crash Protection / 4seven / 2011 -->
+<!-- IF S_USER_LOGGED_IN && (SCRIPT_NAME eq 'posting' || SCRIPT_NAME eq 'ucp') -->
+<input type="hidden" id="content" value="<!-- IF not S_PRIVMSGS -->{POST_SAVE_INSERT}<!-- ELSE -->{PM_SAVE_INSERT}<!-- ENDIF -->" />
+<!-- INCLUDEJS @koutogima_postcrashprotection/js/jquery-latest.min.js -->
+<script type="text/javascript">
+// <![CDATA[
+function imgcopy(){
+var copy = $('#content').val();
+document.forms['postform'].message.value += copy;
+document.forms['postform'].message.focus();
+return false;
+}
+setInterval(function() 
+{
+<!-- IF not S_PRIVMSGS -->
+$('#post_save').load('post_crash_protection.php?text=' +encodeURIComponent($('#message').val()));
+<!-- ELSE -->
+$('#post_save').load('post_crash_protection_pm.php?text=' +encodeURIComponent($('#message').val()));
+<!-- ENDIF -->
+}, 5000);
+// ]]>	
+</script>
+<input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_SAVED_POST_TEXT}<!-- ELSE -->{L_INSR_SAVED_PM_TEXT}<!-- ENDIF -->" onclick="imgcopy();" />
+<div id="post_save" style="display: none;"></div> 	
+<!-- ENDIF -->
+<!-- Post Crash Protection / 4seven / 2011 -->
