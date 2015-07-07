@@ -1,7 +1,7 @@
 <?php
 /**
 *
-* Post Crash Protection extension for the phpBB Forum Software package.
+* DICEK BBCode extension for the phpBB Forum Software package.
 *
 * @copyright (c) 2013 phpBB Limited <https://www.phpbb.com>
 * @license GNU General Public License, version 2 (GPL-2.0)
