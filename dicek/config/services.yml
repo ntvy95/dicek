@@ -1,0 +1,10 @@
+services:
+    koutogima.dicek.event.main_listener:
+        class: koutogima\dicek\event\main_listener
+        arguments:
+            - @user
+            - @template
+            - @dbal.conn
+            - %tables.posts%
+        tags:
+            - { name: event.listener }
