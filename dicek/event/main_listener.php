@@ -24,18 +24,14 @@ class main_listener implements EventSubscriberInterface
 	}
 	protected $db;
 	protected $posts_table;
-	protected $user;
-	protected $template;
 	protected $post_id;
 	protected $dicek_range_index;
 	protected $post_dicek;
 	static $pattern;
 	
-	public function __construct(\phpbb\user $user, \phpbb\template\template $template, \phpbb\db\driver\driver_interface $db, $posts_table) {
-		$this->user = $user;
+	public function __construct(\phpbb\db\driver\driver_interface $db, $posts_table) {
 		$this->db = $db;
 		$this->posts_table = $posts_table;
-		$this->template = $template;
 		$this->dicek_range_index = array();
 		$this->post_id = -1;
 		self::$pattern = '@\[dicek\]([0-9]+|([0-9]+(-[0-9]+)+))\[/dicek\]@i';
