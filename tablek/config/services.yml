@@ -1,0 +1,6 @@
+services:
+    koutogima.tablek.event.main_listener:
+        class: koutogima\tablek\event\main_listener
+        arguments:
+        tags:
+            - { name: event.listener }
