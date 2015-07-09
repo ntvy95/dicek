@@ -20,6 +20,7 @@ class main_listener implements EventSubscriberInterface
 			//'core.posting_modify_message_text' => 'posting_modify_message_text',
 			'core.submit_post_end' => 'submit_post_end',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
+			'core.posting_modify_cannot_edit_conditions' => 'posting_modify_cannot_edit_conditions',
 		);
 	}
 	protected $db;
@@ -28,6 +29,7 @@ class main_listener implements EventSubscriberInterface
 	protected $dicek_range_index;
 	protected $post_dicek;
 	static $pattern;
+	static $pattern_checkdicek;
 	
 	public function __construct(\phpbb\db\driver\driver_interface $db, $posts_table) {
 		$this->db = $db;
@@ -35,6 +37,7 @@ class main_listener implements EventSubscriberInterface
 		$this->dicek_range_index = array();
 		$this->post_id = -1;
 		self::$pattern = '@\[dicek\]([0-9]+|([0-9]+(-[0-9]+)+))\[/dicek\]@i';
+		self::$pattern_checkdicek = '@\[checkdicek](|[0-9]+)\[/checkdicek]@i';
 	}
 	
 	public function submit_post_end($event) {
@@ -160,12 +163,19 @@ class main_listener implements EventSubscriberInterface
 		return $arr;
 	}
 	
-	public function message_after($message) {
+	public function message_dicek_after($message) {
 		return preg_replace_callback(self::$pattern,
 		function ($match) {
 			return $this->bb_dicek_replace($match[1]);
 		}, $message);
 	}	
+	
+	public function message_checkdicek_after($message) {
+		return preg_replace_callback(self::$pattern_checkdicek,
+		function ($match) {
+			return $this->bb_checkdicek_replace($match[1]);
+		}, $message);
+	}
 	
 	public function bb_dicek_replace($dicek_range_string) {
 			$dicek_range = self::convert_dicek_string_to_array($dicek_range_string);
@@ -180,20 +190,35 @@ class main_listener implements EventSubscriberInterface
 				return self::convert_dicek_array_to_string($dicek_value);
 	}
 	
+	public function bb_checkdicek_replace($post_id) {
+		if(empty($post_id)) {
+			$post_id = $this->post_id;
+		}
+		$message = '<hr />POST ID: ' . $post_id . '<br /> Dice Range: ' .
+					self::get_current_dicek_range_string($post_id) .
+					'<br /> Corresponding Dice Result: ' . self::get_current_dicek_value_string($post_id) . '<hr />';
+		return $message;
+	}
+	
 	public function viewtopic_modify_post_data($event) {
 		$rowset = $event['rowset'];
 		for($i = 0, $size = sizeof($event['post_list']); $i < $size; $i++) {
 			$this->post_id = $event['post_list'][$i];
+			$message = $rowset[$this->post_id]['post_text'];
 			$post_dicek_range_string = $this->get_current_dicek_range_string($this->post_id);
 			if(empty($post_dicek_range_string) === false) {
 				$post_dicek_value_string = $this->get_current_dicek_value_string($this->post_id);
 				$this->post_dicek = self::get_current_dicek($post_dicek_range_string, $post_dicek_value_string);
-				$message = $rowset[$this->post_id]['post_text'];
-				$message = $this->message_after($message);
-				$rowset[$this->post_id]['post_text'] = $message;
+				$message = $this->message_dicek_after($message);
 				$this->dicek_range_index = array();
 			}
+			$message = $this->message_checkdicek_after($message);
+			$rowset[$this->post_id]['post_text'] = $message;
 		}
 		$event['rowset'] = $rowset;
+	}
+	
+	public function posting_modify_cannot_edit_conditions($event) {
+		
 	}
 }
