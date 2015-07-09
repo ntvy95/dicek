@@ -16,23 +16,27 @@ class main_listener implements EventSubscriberInterface
 	{
 		return array(
 			'core.modify_text_for_display_before' => 'modify_text_for_display_before',
+			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
 		);
 	}
 	
-	static $pattern_table;
 	static $pattern_row_overall;
-	static $pattern_col_overall;
+	/*sstatic $pattern_col_overall;
 	static $pattern_class;
-	static $pattern_id;
+	static $pattern_id;*/
 	
 	public function __construct() {
 		self::$pattern_row_overall = "@{(|(.))+}@";
-		self::$pattern_class = "@class=(([a-zA-Z0-9-_]+)|('[a-zA-Z0-9-_ ]+)')@";
-		self::$pattern_id = "@id=([a-zA-Z0-9-_]+)@";
-		ini_set("pcre.recursion_limit", "524");
+		/*self::$pattern_class = "@class=(|(.+?))((?=([a-zA-Z0-9-_ ]+)))@i";
+		self::$pattern_id = "@id=[^\s]+@i";
+		self::$pattern_colspan = "@colspan=[0-9]+@i";*/
 	}
 	
 	public function modify_text_for_display_before($event) {
+		$event['text'] = self::tablek_parse($event['text']);
+	}
+	
+	public function modify_format_display_text_after($event) {
 		$event['text'] = self::tablek_parse($event['text']);
 	}
 	
@@ -40,7 +44,6 @@ class main_listener implements EventSubscriberInterface
 			$open_tag_start = "[tablek";
 			$open_tag_end = "]";
 			$close_tag = "[/tablek]";
-			//$isclose_array = self::find_all_position($message, $close_tag);
 			$isopen = strpos($message, $open_tag_start, 0);
 			while($isopen !== false) {
 				$isopen = $isopen + strlen($open_tag_start);
@@ -54,17 +57,17 @@ class main_listener implements EventSubscriberInterface
 						if(empty($table_tag) == false) {
 							$table_tag = explode("|", $table_tag, 2);
 							$table_tag_html = $table_tag[0];
-							if(empty($table_tag_html) == false) {
+							/*if(empty($table_tag_html) == false) {
 								//BEGIN: Table HTML attributes.
 								preg_match(self::$pattern_id, $table_tag_html, $table_id);
 								preg_match(self::$pattern_class, $table_tag_html, $table_class);
 								//END: Table HTML attributes.
-							}
+							}*/
 							$table_tag_css = '';
 							if(isset($table_tag[1])) {
 								$table_tag_css = $table_tag[1];
 							}
-							$head = '<table id="' . $table_id[1] . '" class=' . $table_class[1] . ' style="' . $table_tag_css . '">';
+							$head = '<table ' . $table_tag_html . '>';
 						}
 						else {
 							$head = '<table>';
@@ -84,18 +87,18 @@ class main_listener implements EventSubscriberInterface
 							$row_tag = substr($body, $begin_tag, $end_tag - $begin_tag);
 							$row_tag = explode("|", $row_tag, 2);
 							$row_tag_html = $row_tag[0];
-							if(empty($row_tag_html) == false) {
+							/*if(empty($row_tag_html) == false) {
 								//BEGIN: Row HTML attributes.
 								preg_match(self::$pattern_id, $row_tag_html, $row_id);
 								preg_match(self::$pattern_class, $row_tag_html, $row_class);
 								//END: Row HTML attributes.
-							}
+							}*/
 							$row_tag_css = '';
 							if(isset($row_tag[1])) {
 								$row_tag_css = $row_tag[1];
 							}
 								
-							$head_row = '<tr id=' . $row_id[1] . ' class=' . $row_class[1] . ' style="' . $row_tag_css . '" />';
+							$head_row = '<tr ' . $row_tag_html . '>';
 							$body_row = self::row_parse($row[0]);
 							if(strcmp($body_row, $row[0]) === 0) {
 								$body_row = '';
@@ -111,6 +114,12 @@ class main_listener implements EventSubscriberInterface
 						$isopen = $isopen - strlen($open_tag_start);
 						$message = substr_replace($message, $table, $isopen, $isclose - $isopen);
 					}
+					else {
+						break;
+					}
+				}
+				else {
+					break;
 				}
 				$isopen = strpos($message, $open_tag_start, $isopen - strlen($open_tag_start) + strlen($table));
 			}
@@ -119,7 +128,6 @@ class main_listener implements EventSubscriberInterface
 	
 	static public function row_parse($row) {
 		$cols = explode("|", $row);
-		//exit(var_dump($cols));
 			unset($cols[0]);
 			foreach($cols as $index => $col) {
 				$content = explode("}", $col, 2);
@@ -131,24 +139,22 @@ class main_listener implements EventSubscriberInterface
 				else {
 					$col_tag = explode("[", $content[0], 2);
 					$col_tag_html = $col_tag[0];
-					if(empty($col_tag_html) == false) {
+					/*if(empty($col_tag_html) == false) {
 						//BEGIN: Col HTML attributes.
 						preg_match(self::$pattern_id, $col_tag_html, $col_id);
 						preg_match(self::$pattern_class, $col_tag_html, $col_class);
 						//END: Col HTML attributes.
-					}
+					}*/
 					$col_tag_css = '';
 					if(isset($col_tag[1])) {
 						$col_tag_css = $col_tag[1];
 					}
-					$head_col = '<td id=' . $col_id[1] . ' class=' . $col_class[1] . ' style="' . $col_tag_css . '" />';
+					$head_col = '<td ' . $col_tag_html . '>';
 					$body_col = $content[1];
 					$tail_col = '</td>';
 				}
 				$cols[$index] = $head_col . $body_col . $tail_col;
-				//exit(var_dump($cols[$index]));
 			}
-		//exit(var_dump(implode('', $cols)));
 		return implode($cols);
 	}
 	
