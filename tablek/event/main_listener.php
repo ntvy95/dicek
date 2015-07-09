@@ -157,18 +157,6 @@ class main_listener implements EventSubscriberInterface
 			}
 		return implode($cols);
 	}
-	
-	static public function find_all_position($html, $needle) {
-		$lastPos = 0;
-		$positions = array();
-
-		while (($lastPos = strpos($html, $needle, $lastPos))!== false) {
-			$positions[] = $lastPos;
-			$lastPos = $lastPos + strlen($needle);
-		}
-		
-		return $positions;
-	}
 }
 
 ?>
