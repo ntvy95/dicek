@@ -67,7 +67,7 @@ class main_listener implements EventSubscriberInterface
 							if(isset($table_tag[1])) {
 								$table_tag_css = $table_tag[1];
 							}
-							$head = '<table ' . $table_tag_html . '>';
+							$head = '<table ' . $table_tag_html . ' style="' . $table_tag_css . '">';
 						}
 						else {
 							$head = '<table>';
@@ -98,7 +98,7 @@ class main_listener implements EventSubscriberInterface
 								$row_tag_css = $row_tag[1];
 							}
 								
-							$head_row = '<tr ' . $row_tag_html . '>';
+							$head_row = '<tr ' . $row_tag_html . ' style="' . $row_tag_css . '">';
 							$body_row = self::row_parse($row[0]);
 							if(strcmp($body_row, $row[0]) === 0) {
 								$body_row = '';
@@ -149,7 +149,7 @@ class main_listener implements EventSubscriberInterface
 					if(isset($col_tag[1])) {
 						$col_tag_css = $col_tag[1];
 					}
-					$head_col = '<td ' . $col_tag_html . '>';
+					$head_col = '<td ' . $col_tag_html . ' style="' . $col_tag_css . '">';
 					$body_col = $content[1];
 					$tail_col = '</td>';
 				}
