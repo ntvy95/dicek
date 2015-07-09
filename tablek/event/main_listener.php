@@ -26,9 +26,6 @@ class main_listener implements EventSubscriberInterface
 	static $pattern_id;
 	
 	public function __construct() {
-		//self::$pattern_table = "@\[tablek\]((?:[^[]|\[(?!/?tablek])|(?R))+)\[/tablek]@s";
-		//self::$pattern_table = "@\[tablek(| (.)+)\]((?:[^[]|\[(?!/?tablek])|(?R))+)\[/tablek]@s";
-		//self::$pattern_table = "@\[tablek(| (.)+)\]((.)+)\[/tablek\]@s";
 		self::$pattern_row_overall = "@{(|(.))+}@";
 		self::$pattern_class = "@class=(([a-zA-Z0-9-_]+)|('[a-zA-Z0-9-_ ]+)')@";
 		self::$pattern_id = "@id=([a-zA-Z0-9-_]+)@";
@@ -43,6 +40,7 @@ class main_listener implements EventSubscriberInterface
 			$open_tag_start = "[tablek";
 			$open_tag_end = "]";
 			$close_tag = "[/tablek]";
+			//$isclose_array = self::find_all_position($message, $close_tag);
 			$isopen = strpos($message, $open_tag_start, 0);
 			while($isopen !== false) {
 				$isopen = $isopen + strlen($open_tag_start);
@@ -110,10 +108,11 @@ class main_listener implements EventSubscriberInterface
 						$body = implode($rows);
 						$table = $head . $body . $tail;
 						$isclose = $isclose + strlen($close_tag);
-						$message = substr_replace($message, $table, $isopen - strlen($open_tag_start), $isclose + strlen($close_tag) - $isopen);
+						$isopen = $isopen - strlen($open_tag_start);
+						$message = substr_replace($message, $table, $isopen, $isclose - $isopen);
 					}
 				}
-				$isopen = strpos($message, $open_tag_start, $isclose);
+				$isopen = strpos($message, $open_tag_start, $isopen - strlen($open_tag_start) + strlen($table));
 			}
 			return $message;
 	}
@@ -151,6 +150,18 @@ class main_listener implements EventSubscriberInterface
 			}
 		//exit(var_dump(implode('', $cols)));
 		return implode($cols);
+	}
+	
+	static public function find_all_position($html, $needle) {
+		$lastPos = 0;
+		$positions = array();
+
+		while (($lastPos = strpos($html, $needle, $lastPos))!== false) {
+			$positions[] = $lastPos;
+			$lastPos = $lastPos + strlen($needle);
+		}
+		
+		return $positions;
 	}
 }
 
