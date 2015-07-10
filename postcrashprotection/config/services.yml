@@ -1,4 +1,10 @@
 services:
+    koutogima.postcrashprotection:
+        class: koutogima\postcrashprotection
+        arguments:
+            - @user
+            - @auth
+            - @dbal.conn			
     koutogima.postcrashprotection.event.main_listener:
         class: koutogima\postcrashprotection\event\main_listener
         arguments:

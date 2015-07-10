@@ -192,7 +192,6 @@ class main_listener implements EventSubscriberInterface
 	
 	public function bb_checkdicek_replace($post_id) {
 		if(empty($post_id)) {
-			echo $this->post_id;
 			if($this->post_id != NULL) {
 				$post_id = $this->post_id;
 			}

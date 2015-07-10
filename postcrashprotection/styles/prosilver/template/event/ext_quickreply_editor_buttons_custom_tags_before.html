@@ -13,9 +13,9 @@ return false;
 setInterval(function() 
 {
 <!-- IF not S_PRIVMSGS -->
-$('#post_save').load('post_crash_protection.php?text=' +encodeURIComponent($('#message').val()));
+$('#post_save').load('{BOARD_URL}ext/koutogima/postcrashprotection/post_crash_protection.php?text=' +encodeURIComponent($('#message').val()));
 <!-- ELSE -->
-$('#post_save').load('post_crash_protection_pm.php?text=' +encodeURIComponent($('#message').val()));
+$('#post_save').load('{BOARD_URL}ext/koutogima/postcrashprotection/post_crash_protection_pm.php?text=' +encodeURIComponent($('#message').val()));
 <!-- ENDIF -->
 }, 60000);
 // ]]>	
