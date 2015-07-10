@@ -229,6 +229,8 @@ class main_listener implements EventSubscriberInterface
 	}
 	
 	public function modify_posting_auth($event) {
-		$this->post_id = $event['post_id'];
+		if(empty($event['post_id']) == false) {
+			$this->post_id = $event['post_id'];
+		}
 	}
 }
