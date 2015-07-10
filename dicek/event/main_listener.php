@@ -20,7 +20,8 @@ class main_listener implements EventSubscriberInterface
 			//'core.posting_modify_message_text' => 'posting_modify_message_text',
 			'core.submit_post_end' => 'submit_post_end',
 			'core.viewtopic_modify_post_data' => 'viewtopic_modify_post_data',
-			'core.posting_modify_cannot_edit_conditions' => 'posting_modify_cannot_edit_conditions',
+			'core.modify_posting_auth' => 'modify_posting_auth',
+			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
 		);
 	}
 	protected $db;
@@ -35,7 +36,6 @@ class main_listener implements EventSubscriberInterface
 		$this->db = $db;
 		$this->posts_table = $posts_table;
 		$this->dicek_range_index = array();
-		$this->post_id = -1;
 		self::$pattern = '@\[dicek\]([0-9]+|([0-9]+(-[0-9]+)+))\[/dicek\]@i';
 		self::$pattern_checkdicek = '@\[checkdicek](|[0-9]+)\[/checkdicek]@i';
 	}
@@ -192,7 +192,13 @@ class main_listener implements EventSubscriberInterface
 	
 	public function bb_checkdicek_replace($post_id) {
 		if(empty($post_id)) {
-			$post_id = $this->post_id;
+			echo $this->post_id;
+			if($this->post_id != NULL) {
+				$post_id = $this->post_id;
+			}
+			else {
+				return '[checkdicek][/checkdicek]';
+			}
 		}
 		$message = '<hr />POST ID: ' . $post_id . '<br /> Dice Range: ' .
 					self::get_current_dicek_range_string($post_id) .
@@ -218,7 +224,11 @@ class main_listener implements EventSubscriberInterface
 		$event['rowset'] = $rowset;
 	}
 	
-	public function posting_modify_cannot_edit_conditions($event) {
-		
+	public function modify_format_display_text_after($event) {
+		$event['text'] = $this->message_checkdicek_after($event['text']);
+	}
+	
+	public function modify_posting_auth($event) {
+		$this->post_id = $event['post_id'];
 	}
 }
