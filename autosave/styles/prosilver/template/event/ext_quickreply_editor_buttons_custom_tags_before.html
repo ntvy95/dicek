@@ -9,8 +9,8 @@ var copy = $.jStorage.get('post_text', "");
 <!-- ELSE -->
 var copy = $.jStorage.get('pm_text', "");
 <!-- ENDIF -->
-document.forms['postform'].message.value += copy;
-document.forms['postform'].message.focus();
+document.forms['qr_postform'].message.value += copy;
+document.forms['qr_postform'].message.focus();
 return false;
 }
 setInterval(function() 
@@ -23,5 +23,5 @@ $.jStorage.set('pm_text', $('#message').val());
 }, 1000);
 // ]]>	
 </script>
-<input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_SAVED_POST_TEXT}<!-- ELSE -->{L_INSR_SAVED_PM_TEXT}<!-- ENDIF -->" onclick="imgcopy();" />
+<input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_AUTOSAVED_POST_TEXT}<!-- ELSE -->{L_INSR_AUTOSAVED_PM_TEXT}<!-- ENDIF -->" onclick="imgcopy();" />
 <!-- ENDIF -->

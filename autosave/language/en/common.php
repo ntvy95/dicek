@@ -11,6 +11,6 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-	'INSR_SAVED_POST_TEXT' => 'Insert Saved Post',
-	'INSR_SAVED_PM_TEXT'   => 'Insert Saved PM',
+	'INSR_AUTOSAVED_POST_TEXT' => 'Insert Auto Saved Post',
+	'INSR_AUTOSAVED_PM_TEXT'   => 'Insert Auto Saved PM',
 ));
