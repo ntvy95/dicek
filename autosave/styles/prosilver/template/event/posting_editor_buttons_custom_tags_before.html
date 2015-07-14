@@ -1,0 +1,27 @@
+<!-- IF S_USER_LOGGED_IN && (SCRIPT_NAME eq 'posting' || SCRIPT_NAME eq 'ucp') -->
+<!-- INCLUDEJS @koutogima_autosave/js/json2.js -->
+<!-- INCLUDEJS @koutogima_autosave/js/jstorage.js -->
+<script type="text/javascript">
+// <![CDATA[
+function imgcopy(){
+<!-- IF not S_PRIVMSGS -->
+var copy = $.jStorage.get('post_text', "");
+<!-- ELSE -->
+var copy = $.jStorage.get('pm_text', "");
+<!-- ENDIF -->
+document.forms['postform'].message.value += copy;
+document.forms['postform'].message.focus();
+return false;
+}
+setInterval(function() 
+{
+<!-- IF not S_PRIVMSGS -->
+$.jStorage.set('post_text', $('#message').val());
+<!-- ELSE -->
+$.jStorage.set('pm_text', $('#message').val());
+<!-- ENDIF -->
+}, 1000);
+// ]]>	
+</script>
+<input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_SAVED_POST_TEXT}<!-- ELSE -->{L_INSR_SAVED_PM_TEXT}<!-- ENDIF -->" onclick="imgcopy();" />
+<!-- ENDIF -->

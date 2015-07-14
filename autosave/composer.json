@@ -1,0 +1,26 @@
+{
+	"name": "koutogima/autosave",
+	"type": "phpbb-extension",
+	"description": "The extension will auto-save people's editing posts every certain time invertal. No database involved.",
+	"homepage": "",
+	"version": "0.0.1",
+	"license": "GPL-2.0",
+	"authors": [
+		{
+			"name": "koutogima",
+			"email": "",
+			"homepage": "",
+			"role": ""
+		}
+	],
+	"require": {
+		"php": ">=5.3.3",
+		"composer/installers": "~1.0"
+	},
+	"extra": {
+		"display-name": "Auto-Save",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.1.0"
+		}
+	}
+}

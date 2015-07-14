@@ -1,0 +1,7 @@
+services:	
+    koutogima.autosave.event.main_listener:
+        class: koutogima\autosave\event\main_listener
+        arguments:
+            - @user
+        tags:
+            - { name: event.listener }
