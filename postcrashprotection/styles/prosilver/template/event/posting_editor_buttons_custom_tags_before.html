@@ -13,11 +13,11 @@ return false;
 setInterval(function() 
 {
 <!-- IF not S_PRIVMSGS -->
-$('#post_save').load('{BOARD_URL}ext/koutogima/postcrashprotection/post_crash_protection.php?text=' +encodeURIComponent($('#message').val()));
+$('#post_save').load('post_crash_protection.php?text=' +encodeURIComponent($('#message').val()));
 <!-- ELSE -->
-$('#post_save').load('{BOARD_URL}ext/koutogima/postcrashprotection/post_crash_protection_pm.php?text=' +encodeURIComponent($('#message').val()));
+$('#post_save').load('post_crash_protection_pm.php?text=' +encodeURIComponent($('#message').val()));
 <!-- ENDIF -->
-}, 60000);
+}, 1000);
 // ]]>	
 </script>
 <input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_SAVED_POST_TEXT}<!-- ELSE -->{L_INSR_SAVED_PM_TEXT}<!-- ENDIF -->" onclick="imgcopy();" />

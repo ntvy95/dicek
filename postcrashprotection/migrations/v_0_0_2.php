@@ -24,8 +24,8 @@ class v_0_0_2 extends \phpbb\db\migration\migration {
 		return array(
 			'add_columns' => array(
 				$this->table_prefix . 'users' => array(
-					'last_post_text' => array('MTEXT_UNI', '0'),
-					'last_post_text_pm' => array('MTEXT_UNI', '0'),
+					'last_post_text' => array('MTEXT_UNI', null),
+					'last_post_text_pm' => array('MTEXT_UNI', null),
 				),
 			),
 		);
