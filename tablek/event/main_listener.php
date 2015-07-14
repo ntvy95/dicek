@@ -44,14 +44,14 @@ class main_listener implements EventSubscriberInterface
 			$open_tag_start = "[tablek";
 			$open_tag_end = "]";
 			$close_tag = "[/tablek]";
-			$isopen = strpos($message, $open_tag_start, 0);
+			$isopen = stripos($message, $open_tag_start, 0);
 			while($isopen !== false) {
 				$isopen = $isopen + strlen($open_tag_start);
 				$isopen2 = strpos($message, $open_tag_end, $isopen);
 				if($isopen2 !== false) {
 					$table_tag = substr($message, $isopen, $isopen2 - $isopen);
 					$isopen2 = $isopen2 + strlen($open_tag_end);
-					$isclose = strpos($message, $close_tag, $isopen2);
+					$isclose = stripos($message, $close_tag, $isopen2);
 					if($isclose !== false) {
 						$table = substr($message, $isopen2, $isclose - $isopen2);
 						if(empty($table_tag) == false) {
@@ -121,7 +121,7 @@ class main_listener implements EventSubscriberInterface
 				else {
 					break;
 				}
-				$isopen = strpos($message, $open_tag_start, $isopen - strlen($open_tag_start) + strlen($table));
+				$isopen = stripos($message, $open_tag_start, $isopen - strlen($open_tag_start) + strlen($table));
 			}
 			return $message;
 	}
