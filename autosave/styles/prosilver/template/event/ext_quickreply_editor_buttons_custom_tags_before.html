@@ -3,7 +3,7 @@
 <!-- INCLUDEJS @koutogima_autosave/js/jstorage.js -->
 <script type="text/javascript">
 // <![CDATA[
-function imgcopy(){
+function koucopy(){
 <!-- IF not S_PRIVMSGS -->
 var copy = $.jStorage.get('post_text', "");
 <!-- ELSE -->
@@ -23,5 +23,5 @@ $.jStorage.set('pm_text', $('#message').val());
 }, 5000);
 // ]]>	
 </script>
-<input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_AUTOSAVED_POST_TEXT}<!-- ELSE -->{L_INSR_AUTOSAVED_PM_TEXT}<!-- ENDIF -->" onclick="imgcopy();" />
+<input type="button" class="button2" value="<!-- IF not S_PRIVMSGS -->{L_INSR_AUTOSAVED_POST_TEXT}<!-- ELSE -->{L_INSR_AUTOSAVED_PM_TEXT}<!-- ENDIF -->" onclick="koucopy();" />
 <!-- ENDIF -->
