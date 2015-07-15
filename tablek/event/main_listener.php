@@ -26,7 +26,7 @@ class main_listener implements EventSubscriberInterface
 	static $pattern_id;*/
 	
 	public function __construct() {
-		self::$pattern_row_overall = "@{(|(.))+}@";
+		self::$pattern_row_overall = "@{(|(.)+)}@";
 		/*self::$pattern_class = "@class=(|(.+?))((?=([a-zA-Z0-9-_ ]+)))@i";
 		self::$pattern_id = "@id=[^\s]+@i";
 		self::$pattern_colspan = "@colspan=[0-9]+@i";*/
@@ -75,9 +75,10 @@ class main_listener implements EventSubscriberInterface
 						$body = $table;
 						$tail = '</table>';
 						$rows = preg_split(self::$pattern_row_overall, $body, NULL, PREG_SPLIT_OFFSET_CAPTURE);
+						$rows_collect = array();
 						for($index = 1, $index_end = sizeof($rows); $index < $index_end; $index++){
 							$row = $rows[$index];
-							$begin_tag = strpos($body, '{', intval($rows[$index - 1][1]));
+							$begin_tag = strpos($body, '{', intval($rows[$index - 1][1])) + 1;
 							$end_tag = strpos($body, '}', $begin_tag);
 							if($end_tag === false) {
 								unset($rows[$index]);
@@ -105,10 +106,9 @@ class main_listener implements EventSubscriberInterface
 							}
 							$tail_row = '</tr>';
 								
-							$rows[$index] = $head_row . $body_row . $tail_row;				
+							$rows_collect[$index] = $head_row . $body_row . $tail_row;				
 						}
-						unset($rows[0]);
-						$body = implode($rows);
+						$body = implode($rows_collect);
 						$table = $head . $body . $tail;
 						$isclose = $isclose + strlen($close_tag);
 						$isopen = $isopen - strlen($open_tag_start);
