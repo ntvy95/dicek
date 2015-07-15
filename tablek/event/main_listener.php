@@ -26,7 +26,7 @@ class main_listener implements EventSubscriberInterface
 	static $pattern_id;*/
 	
 	public function __construct() {
-		self::$pattern_row_overall = "@{(|(.)+)}@";
+		self::$pattern_row_overall = "@\{(|((?!\}).)+)\}@";
 		/*self::$pattern_class = "@class=(|(.+?))((?=([a-zA-Z0-9-_ ]+)))@i";
 		self::$pattern_id = "@id=[^\s]+@i";
 		self::$pattern_colspan = "@colspan=[0-9]+@i";*/
