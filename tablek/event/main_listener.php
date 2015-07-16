@@ -15,7 +15,7 @@ class main_listener implements EventSubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return array(
-			'core.modify_text_for_display_before' => 'modify_text_for_display_before',
+			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
 			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
 		);
 	}
@@ -32,7 +32,7 @@ class main_listener implements EventSubscriberInterface
 		self::$pattern_colspan = "@colspan=[0-9]+@i";*/
 	}
 	
-	public function modify_text_for_display_before($event) {
+	public function modify_text_for_display_after($event) {
 		$event['text'] = self::tablek_parse($event['text']);
 	}
 	
