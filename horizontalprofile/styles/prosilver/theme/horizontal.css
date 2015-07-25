@@ -1,0 +1,16 @@
+.postprofile dt  {
+	float: left;
+	margin: 0px 10px 0px 0px;
+}
+
+.postprofile .username-coloured {
+	display: none !important;
+}
+
+.postprofile {
+	float: none !important;
+}
+
+.postbody {
+	width: 100% !important;
+}
