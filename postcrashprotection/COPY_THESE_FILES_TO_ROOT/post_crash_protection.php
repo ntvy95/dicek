@@ -22,8 +22,7 @@ if ($user->data['user_id'] !== ANONYMOUS){
 $text = utf8_normalize_nfc(request_var('text', '', true));
 
 if (!empty($text)){
-		$text = str_replace("'",'&quot;',$text);
-
+$text = $db->sql_escape($text);
 		$sql_last_up = 'UPDATE ' . USERS_TABLE . "
 						SET last_post_text = '$text'
 						WHERE user_id = " . (int) $user->data['user_id'];
