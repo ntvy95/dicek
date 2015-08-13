@@ -44,7 +44,7 @@ class main_listener implements EventSubscriberInterface
 			if($close_tag_pos !== false) {
 				$display_content = substr($message, $open_tag_pos, $close_tag_pos - $open_tag_pos);
 				$copy_content = str_replace(array("[", "]"), array("&#91;", "&#93;"), $display_content);
-				$content = '<textarea readonly="readonly" onclick="this.select();" style="width: 100%; max-height: 2em; overflow: hidden;">'
+				$content = '<textarea readonly="readonly" onclick="this.select();" style="max-height: 2em; overflow: hidden;">'
 							. $copy_content . '</textarea>' . $display_content;
 				$open_tag_pos = $open_tag_pos - strlen(self::$open_tag);
 				$close_tag_pos = $close_tag_pos + strlen(self::$close_tag);
