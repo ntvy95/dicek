@@ -19,6 +19,7 @@ class main_listener implements EventSubscriberInterface
 			'core.topic_review_modify_row' => 'topic_review_modify_row',
 			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
 			'core.modify_format_display_text_before' => 'modify_format_display_text_before',
+			'core.ucp_pm_view_messsage' => 'ucp_pm_view_messsage',
 		);
 	}
 	
@@ -50,6 +51,12 @@ class main_listener implements EventSubscriberInterface
 		$row = $event['row'];
 		$post_row['MESSAGE'] = $this->copy_parse_wrapper($post_row['MESSAGE']);
 		$event['post_row'] = $post_row;
+	}
+	
+	public function ucp_pm_view_messsage($event) {
+		$msg_data = $event['msg_data'];
+		$msg_data['MESSAGE'] = $this->copy_parse_wrapper($msg_data['MESSAGE']);
+		$event['msg_data'] = $msg_data;
 	}
 	
 	public function modify_text_for_display_after($event) {
