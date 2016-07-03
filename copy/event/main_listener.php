@@ -74,6 +74,7 @@ class main_listener implements EventSubscriberInterface
 			$result = $this->find_pairs($open_matches, $close_matches);
 			$matches = $result[0];
 			$tree = $result[1];
+			//var_dump($result);
 			$result = $this->replace_copy_bbcode($message, $tree, $matches, $open_matches, $close_matches, 0);
 			$message = $result[0];
 		}
@@ -90,7 +91,8 @@ class main_listener implements EventSubscriberInterface
 			$display_content = substr(	$message,
 										$start_dist + $start + $this->len['open_tag'],
 										$copy_content_length);
-			$copy_content = str_replace(array("[", "]"), array("&#91;", "&#93;"), $display_content);
+			$replace_count = 0;
+			$copy_content = str_replace(array("[", "]"), array("&#91;", "&#93;"), $display_content, $replace_count);
 			//var_dump($display_content);
 			if(is_array($children)) {
 				$result = $this->replace_copy_bbcode($display_content, $children, $matches, $open_matches, $close_matches,
@@ -106,9 +108,10 @@ class main_listener implements EventSubscriberInterface
 			$content = $this->replace_string['open_tag'] . $copy_content . $this->replace_string['close_tag'] . $display_content;
 			$message = substr_replace($message, $content, $start_dist + $start, $length);
 			$dist = - $this->len['open_tag'] - $this->len['close_tag']
-						+ $display_content_length + $this->len['replace_open_tag'] + $this->len['replace_close_tag'];
+						+ $display_content_length + $replace_count * 4 + $this->len['replace_open_tag'] + $this->len['replace_close_tag'];
 			$start_dist = $start_dist + $dist;
 			$message_length = $message_length + $dist;
+			//var_dump($message);
 		}
 		return array($message, $message_length);
 	}
