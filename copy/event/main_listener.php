@@ -19,6 +19,7 @@ class main_listener implements EventSubscriberInterface
 			'core.topic_review_modify_row' => 'topic_review_modify_row',
 			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
 			'core.modify_format_display_text_before' => 'modify_format_display_text_before',
+			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
 			'core.ucp_pm_view_messsage' => 'ucp_pm_view_messsage',
 		);
 	}
@@ -67,6 +68,10 @@ class main_listener implements EventSubscriberInterface
 		$event['text'] = $this->copy_parse_wrapper($event['text']);
 	}
 	
+	public function modify_format_display_text_after($event) {
+		$event['text'] = $this->remove_br($event['text']);
+	}
+	
 	public function copy_parse_wrapper($message) {
 		if(preg_match_all($this->open_tag, $message, $open_matches, PREG_OFFSET_CAPTURE)
 		&& preg_match_all($this->close_tag, $message, $close_matches, PREG_OFFSET_CAPTURE))
@@ -75,14 +80,14 @@ class main_listener implements EventSubscriberInterface
 			$matches = $result[0];
 			$tree = $result[1];
 			//var_dump($result);
-			$result = $this->replace_copy_bbcode($message, $tree, $matches, $open_matches, $close_matches, 0);
+			//var_dump("=====================\n");
+			$result = $this->replace_copy_bbcode($message, $tree, $matches, $open_matches, $close_matches);
 			$message = $result[0];
 		}
 		return $message;
 	}
 	
-	public function replace_copy_bbcode($message, $tree, $matches, $open_matches, $close_matches, $start_dist) {
-		$message_length = 0;
+	public function replace_copy_bbcode($message, $tree, $matches, $open_matches, $close_matches, $start_dist = 0, $message_length = 0) {
 		foreach($tree as $parent => $children) {
 			$i = $parent;
 			$j = $matches[$parent];
@@ -93,10 +98,12 @@ class main_listener implements EventSubscriberInterface
 										$copy_content_length);
 			$replace_count = 0;
 			$copy_content = str_replace(array("[", "]"), array("&#91;", "&#93;"), $display_content, $replace_count);
+			//var_dump($message);
+			//var_dump("--------------------\n");
 			//var_dump($display_content);
 			if(is_array($children)) {
 				$result = $this->replace_copy_bbcode($display_content, $children, $matches, $open_matches, $close_matches,
-						$start_dist - $this->len['open_tag']);
+						- $start - $this->len['open_tag'], $copy_content_length);
 				//var_dump($result);
 				$display_content = $result[0];
 				$display_content_length = $result[1];
