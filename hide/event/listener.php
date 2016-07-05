@@ -22,6 +22,7 @@ class listener implements EventSubscriberInterface
 	protected $user;
 	protected $template;
 	protected $current_row;
+	protected $hilit;
 
 	/**
 	* Constructor
@@ -42,6 +43,8 @@ class listener implements EventSubscriberInterface
 			'core.viewtopic_post_rowset_data'	=> 'viewtopic_post_rowset_data',
 			'core.topic_review_modify_row' => 'topic_review_modify_row',
 			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
+			'core.search_modify_tpl_ary' => 'search_modify_tpl_ary',
+			'core.search_modify_rowset' => 'search_modify_rowset',
 		);
 	}
 	
@@ -78,8 +81,27 @@ class listener implements EventSubscriberInterface
 	
 	public function modify_format_display_text_after($event) {
 		$text = $event['text'];
-		$this->replace_hide_bbcode_wrapper($this->user->data['user_id'], $event['user_sig_bbcode_uid'], $text, false);
+		$this->replace_hide_bbcode_wrapper($this->user->data['user_id'], null, $text, false);
 		$event['text'] = $text;
+	}
+	
+	public function search_modify_rowset($event) {
+		$this->hilit = $event['hilit'];
+	}
+	
+	public function search_modify_tpl_ary($event) {
+		$tpl_ary = $event['tpl_ary'];
+		$message = $tpl_ary['MESSAGE'];
+		if($this->hilit == "hide") {
+			$message = str_replace('<span class="posthilit">hide</span>', 'hide', $message);
+		}
+		$message = preg_replace('@\[hide(|\=(<span class="posthilit">([0-9,]+)</span>)(|\|([0-9,]+)))(|'
+								.$event['row']['bbcode_uid'].')\]@', '[hide=${3}|${5}]', $message);
+		$message = preg_replace('@\[hide(|\=(|[0-9,]+)(|\|(<span class="posthilit">([0-9,]+)</span>)))(|'
+								.$event['row']['bbcode_uid'].')\]@', '[hide=${2}|${5}]', $message);
+		$this->replace_hide_bbcode_wrapper($event['row']['poster_id'], $event['row']['bbcode_uid'], $message, true);
+		$tpl_ary['MESSAGE'] = $message;
+		$event['tpl_ary'] = $tpl_ary;
 	}
 	
 	public function replace_hide_bbcode_wrapper($user_id, $bbcode_uid, &$message, $decoded) {

@@ -1,0 +1,5 @@
+services:
+    koutogima.other.event.listener:
+        class: koutogima\other\event\listener
+        tags:
+            - { name: event.listener }
