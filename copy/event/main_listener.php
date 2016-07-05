@@ -21,6 +21,8 @@ class main_listener implements EventSubscriberInterface
 			'core.modify_format_display_text_before' => 'modify_format_display_text_before',
 			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
 			'core.ucp_pm_view_messsage' => 'ucp_pm_view_messsage',
+			'core.search_modify_rowset' => 'search_modify_rowset',
+			'core.search_modify_tpl_ary' => 'search_modify_tpl_ary',
 		);
 	}
 	
@@ -70,6 +72,20 @@ class main_listener implements EventSubscriberInterface
 	
 	public function modify_format_display_text_after($event) {
 		$event['text'] = $this->remove_br($event['text']);
+	}
+	
+	public function search_modify_rowset($event) {
+		$rowset = $event['rowset'];
+		foreach($rowset as &$row) {
+			$row['post_text'] = $this->copy_parse_wrapper($row['post_text']);
+		}
+		$event['rowset'] = $rowset;
+	}
+	
+	public function search_modify_tpl_ary($event) {
+		$tpl_ary = $event['tpl_ary'];
+		$tpl_ary['MESSAGE'] = $this->remove_br($tpl_ary['MESSAGE']);
+		$event['tpl_ary'] = $tpl_ary;
 	}
 	
 	public function copy_parse_wrapper($message) {
