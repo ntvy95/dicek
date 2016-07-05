@@ -129,13 +129,14 @@ class listener implements EventSubscriberInterface
 			while($current != -1) {
 				if($next[$current] < count($open_matches[0])
 				&& $open_matches[0][$next[$current]][1] < $close_matches[0][$i][1]) {
-					if($tree_inf[$current] == $current) {
+					if(isset($tree_inf[$current])
+					  && $tree_inf[$current] == $current) {
 						$tree_inf[$current] = array();
 					}
 					$tree_inf[$current][$next[$current]] = $next[$current];
 					$prev[$next[$current]] = $current;
 					$current = $next[$current];
-					if($next[$current] == null) {
+					if(!isset($next[$current])) {
 						$next[$current] = $current + 1;
 					}
 				}
