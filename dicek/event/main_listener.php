@@ -16,7 +16,8 @@ class main_listener implements EventSubscriberInterface
 	{
 		return array(
 			'core.submit_post_end' => 'submit_post_end',
-			'core.viewtopic_post_rowset_data'	=> 'viewtopic_post_rowset_data',
+			//'core.viewtopic_post_rowset_data'	=> 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 			'core.topic_review_modify_row' => 'topic_review_modify_row',
 		);
 	}
@@ -63,10 +64,10 @@ class main_listener implements EventSubscriberInterface
 		}
 	}
 	
-	public function viewtopic_post_rowset_data($event) {
-		$rowset_data = $event['rowset_data'];
-		$rowset_data['post_text'] = $this->parse_bbcode_dicek($rowset_data['post_id'], $rowset_data['post_text']);
-		$event['rowset_data'] = $rowset_data;
+	public function viewtopic_modify_post_row($event) {
+		$post_row = $event['post_row'];
+		$post_row['MESSAGE'] = $this->parse_bbcode_dicek($post_row['POST_ID'], $post_row['MESSAGE']);
+		$event['post_row'] = $post_row;
 	}
 	
 	public function topic_review_modify_row($event) {
