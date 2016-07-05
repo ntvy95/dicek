@@ -37,11 +37,11 @@ class listener implements EventSubscriberInterface
 		$page_data = $event['page_data'];
 		$page_data['S_DELETE_ALLOWED'] = ($event['mode'] == 'edit'
 		&& (($event['post_data']['poster_id'] == $this->user->data['user_id']
-		&& $this->auth->acl_get('f_delete', $forum_id)
+		&& $this->auth->acl_get('f_delete', $event['forum_id'])
 		&& !$event['post_data']['post_edit_locked']
 		&& ($event['post_data']['post_time'] > time() - ($this->config['delete_time'] * 60)
 		|| !$this->config['delete_time']))
-		|| $this->auth->acl_get('m_delete', $forum_id)))
+		|| $this->auth->acl_get('m_delete', $event['forum_id'])))
 		? true : false;
 		$event['page_data'] = $page_data;
 	}
