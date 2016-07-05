@@ -170,7 +170,7 @@ class main_listener implements EventSubscriberInterface
 	public function key_to_data($key, $data) {
 		$arr = array();
 		foreach($data as $index => $value) {
-			if($arr[$key[$index]] == NULL) {
+			if(!isset($arr[$key[$index]])) {
 				$arr[$key[$index]] = array();
 			}
 			array_push($arr[$key[$index]], $value);
