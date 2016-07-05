@@ -168,8 +168,10 @@ class listener implements EventSubscriberInterface
 		if(isset($tree_inf[$parent])) {
 			$children = $tree_inf[$parent];
 			unset($tree_inf[$parent]);
-			foreach($children as &$child) {
-				$child = $this->buildTree($child, $tree_inf);
+			if(is_array($children)) {
+				foreach($children as &$child) {
+					$child = $this->buildTree($child, $tree_inf);
+				}
 			}
 		}
 		else {
