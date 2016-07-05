@@ -106,7 +106,7 @@ class listener implements EventSubscriberInterface
 	
 	public function replace_hide_bbcode_wrapper($user_id, $bbcode_uid, &$message, $decoded) {
 		$this->current_row['user_id'] = $user_id;
-		$this->current_row['regex']['open_tag'] = "@\[hide(|\=(|[0-9,]+)(|\|([0-9,]+)))(|:". $bbcode_uid .")\]@is";
+		$this->current_row['regex']['open_tag'] = "@\[hide(|\=(|[0-9,]+)(|\||\|([0-9,]+)))(|:". $bbcode_uid .")\]@is";
 		$this->current_row['regex']['close_tag'] = "@\[/hide(|:". $bbcode_uid .")\]@is";
 		if(preg_match_all($this->current_row['regex']['open_tag'], $message, $open_matches, PREG_OFFSET_CAPTURE)
 		&& preg_match_all($this->current_row['regex']['close_tag'], $message, $close_matches, PREG_OFFSET_CAPTURE))
