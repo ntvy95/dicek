@@ -1,0 +1,7 @@
+services:
+    koutogima.other.listener:
+        class: koutogima\other\event\listener
+        arguments:
+            - @user
+        tags:
+            - { name: event.listener }
