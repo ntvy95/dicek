@@ -15,14 +15,12 @@ class main_listener implements EventSubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return array(
-			'core.viewtopic_post_rowset_data' => 'viewtopic_post_rowset_data',
-			'core.topic_review_modify_row' => 'topic_review_modify_row',
+			'core.modify_text_for_display_before' => 'modify_text_for_display_before',
 			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
 			'core.modify_format_display_text_before' => 'modify_format_display_text_before',
 			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
-			'core.ucp_pm_view_messsage' => 'ucp_pm_view_messsage',
-			'core.search_modify_rowset' => 'search_modify_rowset',
 			'core.search_modify_tpl_ary' => 'search_modify_tpl_ary',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
 		);
 	}
 	
@@ -30,8 +28,9 @@ class main_listener implements EventSubscriberInterface
 	protected $close_tag;
 	protected $len;
 	protected $replace_string;
+	protected $request;
 	
-	public function __construct() {
+	public function __construct(\phpbb\request\request $request) {
 		$this->open_tag = "@\[copy\]@is";
 		$this->close_tag = "@\[\/copy\]@is";
 		$this->len['open_tag'] = strlen("[copy]");
@@ -41,25 +40,11 @@ class main_listener implements EventSubscriberInterface
 		$this->replace_string['close_tag'] = '</textarea>';
 		$this->len['replace_open_tag'] = strlen($this->replace_string['open_tag']);
 		$this->len['replace_close_tag'] = strlen($this->replace_string['close_tag']);
+		$this->request = $request;
 	}
 	
-	public function viewtopic_post_rowset_data($event) {
-		$rowset_data = $event['rowset_data'];
-		$rowset_data['post_text'] = $this->copy_parse_wrapper($rowset_data['post_text']);
-		$event['rowset_data'] = $rowset_data;
-	}
-	
-	public function topic_review_modify_row($event) {
-		$post_row = $event['post_row'];
-		$row = $event['row'];
-		$post_row['MESSAGE'] = $this->copy_parse_wrapper($post_row['MESSAGE']);
-		$event['post_row'] = $post_row;
-	}
-	
-	public function ucp_pm_view_messsage($event) {
-		$msg_data = $event['msg_data'];
-		$msg_data['MESSAGE'] = $this->copy_parse_wrapper($msg_data['MESSAGE']);
-		$event['msg_data'] = $msg_data;
+	public function modify_text_for_display_before($event) {
+		$event['text'] = $this->copy_parse_wrapper($event['text']);
 	}
 	
 	public function modify_text_for_display_after($event) {
@@ -74,18 +59,26 @@ class main_listener implements EventSubscriberInterface
 		$event['text'] = $this->remove_br($event['text']);
 	}
 	
-	public function search_modify_rowset($event) {
-		$rowset = $event['rowset'];
-		foreach($rowset as &$row) {
-			$row['post_text'] = $this->copy_parse_wrapper($row['post_text']);
+	public function search_modify_tpl_ary($event) {
+		if($this->request->variable('keywords', '')) {
+			$tpl_ary = $event['tpl_ary'];
+			$tpl_ary['MESSAGE'] = $this->remove_hilit($tpl_ary['MESSAGE']);
+			$event['tpl_ary'] = $tpl_ary;
 		}
-		$event['rowset'] = $rowset;
 	}
 	
-	public function search_modify_tpl_ary($event) {
-		$tpl_ary = $event['tpl_ary'];
-		$tpl_ary['MESSAGE'] = $this->remove_br($tpl_ary['MESSAGE']);
-		$event['tpl_ary'] = $tpl_ary;
+	public function viewtopic_modify_post_row($event) {
+		if($this->request->variable('hilit', '')) {
+			$post_row = $event['post_row'];
+			$post_row['MESSAGE'] = $this->remove_hilit($post_row['MESSAGE']);
+			$event['post_row'] = $post_row;
+		}
+	}
+	
+	public function remove_hilit($message) {
+		return preg_replace_callback("@<textarea(.*?)</textarea>@i", function($matches) {
+			return str_replace(array('<span class="posthilit">', '</span>'), array('', ''), $matches[0]);
+		}, $message);
 	}
 	
 	public function copy_parse_wrapper($message) {
@@ -97,6 +90,7 @@ class main_listener implements EventSubscriberInterface
 			$tree = $result[1];
 			//var_dump($result);
 			//var_dump("=====================\n");
+			//var_dump($message);
 			$result = $this->replace_copy_bbcode($message, $tree, $matches, $open_matches, $close_matches);
 			$message = $result[0];
 		}
@@ -127,8 +121,9 @@ class main_listener implements EventSubscriberInterface
 			else {
 				$display_content_length = $copy_content_length;
 			}
-			$length = $this->len['open_tag'] + $this->len['close_tag'] + $display_content_length;
+			$length = $this->len['open_tag'] + $this->len['close_tag'] + $copy_content_length;
 			$content = $this->replace_string['open_tag'] . $copy_content . $this->replace_string['close_tag'] . $display_content;
+
 			$message = substr_replace($message, $content, $start_dist + $start, $length);
 			$dist = - $this->len['open_tag'] - $this->len['close_tag']
 						+ $display_content_length + $replace_count * 4 + $this->len['replace_open_tag'] + $this->len['replace_close_tag'];

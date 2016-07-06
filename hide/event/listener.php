@@ -21,30 +21,35 @@ class listener implements EventSubscriberInterface
 {
 	protected $user;
 	protected $template;
+	protected $db;
 	protected $current_row;
-	protected $hilit;
+	protected $post_list;
+	protected $iterator;
+	protected $end;
+	protected $decoded;
+	protected $is_quoted;
 
-	/**
-	* Constructor
-	*
-	* @param \phpbb\db\driver\driver $db Database object
-	* @param \phpbb\controller\helper    $helper        Controller helper object
-	*/
-	public function __construct(\phpbb\user $user, \phpbb\template\template $template)
+	public function __construct(\phpbb\user $user, \phpbb\template\template $template, \phpbb\db\driver\driver_interface $db)
 	{
 		$this->user = $user;
 		$this->template = $template;
+		$this->db = $db;
 	}
 
 	static public function getSubscribedEvents()
 	{
 		return array(
 			'core.user_setup'	=> 'load_language_on_setup',
-			'core.viewtopic_post_rowset_data'	=> 'viewtopic_post_rowset_data',
+			'core.viewtopic_modify_post_data'	=> 'viewtopic_modify_post_data',
+			'core.topic_review_modify_post_list' => 'topic_review_modify_post_list',
 			'core.topic_review_modify_row' => 'topic_review_modify_row',
 			'core.modify_format_display_text_after' => 'modify_format_display_text_after',
-			'core.search_modify_tpl_ary' => 'search_modify_tpl_ary',
+			'core.modify_text_for_display_after' => 'modify_text_for_display_after',
+			'core.decode_message_after' => 'decode_message_after',
 			'core.search_modify_rowset' => 'search_modify_rowset',
+			'core.modify_posting_parameters' => 'modify_posting_parameters',
+			'core.viewtopic_modify_post_row' => 'viewtopic_modify_post_row',
+			'core.search_modify_tpl_ary' => 'search_modify_tpl_ary',
 		);
 	}
 	
@@ -65,18 +70,114 @@ class listener implements EventSubscriberInterface
 		$event['lang_set_ext'] = $lang_set_ext;
 	}
 	
-	public function viewtopic_post_rowset_data($event) {
-		$rowset_data = $event['rowset_data'];
-		$this->replace_hide_bbcode_wrapper($rowset_data['user_id'], $rowset_data['bbcode_uid'], $rowset_data['post_text'], false);
-		$event['rowset_data'] = $rowset_data;
+	public function viewtopic_modify_post_data($event) {
+		$this->post_list = array();
+		$post_list = $event['post_list'];
+		$rowset = $event['rowset'];
+		for ($i = 0, $end = sizeof($post_list); $i < $end; ++$i)
+		{
+			if (!isset($rowset[$post_list[$i]]))
+			{
+				continue;
+			}
+			$row = $rowset[$post_list[$i]];
+			$poster_id = $row['user_id'];
+			$this->post_list[$i] = $poster_id;
+		}
+		$this->iterator = 0;
+		$this->end = $end;
+		$this->decoded = false;
+	}
+	
+	public function search_modify_rowset($event) {
+		$this->post_list = array();
+		$rowset = $event['rowset'];
+		$i = 0;
+		foreach ($rowset as $row)
+		{
+			$this->post_list[$i] = $row['poster_id'];
+			$i = $i + 1;
+		}
+		$this->iterator = 0;
+		$this->end = count($rowset);
+		$this->decoded = true;
+	}
+	
+	public function topic_review_modify_post_list($event) {
+		$this->post_list = array();
+		$post_list = $event['post_list'];
+		$rowset = $event['rowset'];
+		for ($i = 0, $end = sizeof($post_list); $i < $end; ++$i)
+		{
+			if (!isset($rowset[$post_list[$i]]))
+			{
+				continue;
+			}
+			$row = $rowset[$post_list[$i]];
+			$poster_id = $row['user_id'];
+			$this->post_list[$i] = $poster_id;
+		}
+		$this->iterator = 0;
+		$this->end = $end;
+		$this->decoded = false;
+	}
+	
+	public function modify_text_for_display_after($event) {
+		if(isset($this->iterator)) {
+			$this->current_row['user_id'] = $this->post_list[$this->iterator];
+		}
+		$text = $event['text'];
+		if(isset($this->current_row['user_id'])) {
+			$this->replace_hide_bbcode_wrapper($this->current_row['user_id'], $event['uid'], $text, $this->decoded);
+		}
+		else {
+			$this->replace_hide_bbcode_wrapper(null, $event['uid'], $text, $this->decoded);
+		}
+		$event['text'] = $text;
+	}
+	
+	public function decode_message_after($event) {
+		if(isset($this->iterator)) {
+			$this->current_row['user_id'] = $this->post_list[$this->iterator];
+		}
+		$text = $event['message_text'];
+		if(isset($this->current_row['user_id'])) {
+			if($this->user->data['user_id'] != $this->current_row['user_id']) {
+				$this->replace_hide_bbcode_wrapper($this->current_row['user_id'], $event['bbcode_uid'], $text, true);
+			}
+		}
+		else {
+			$this->replace_hide_bbcode_wrapper(null, $event['bbcode_uid'], $text, true);
+		}
+		$event['message_text'] = $text;
+	}
+	
+	public function modify_posting_parameters($event) {
+		$sql = 'SELECT poster_id
+			FROM ' . POSTS_TABLE . '
+			WHERE post_id = ' . $event['post_id'];
+		$result = $this->db->sql_query($sql);
+		$this->current_row['user_id'] = (int) $this->db->sql_fetchfield('poster_id');
+		$this->db->sql_freeresult($result);
 	}
 	
 	public function topic_review_modify_row($event) {
-		$post_row = $event['post_row'];
-		$row = $event['row'];
-		$this->replace_hide_bbcode_wrapper($row['user_id'], $row['bbcode_uid'], $post_row['MESSAGE'], false);
-		$this->replace_hide_bbcode_wrapper($row['user_id'], $row['bbcode_uid'], $post_row['DECODED_MESSAGE'], true);
-		$event['post_row'] = $post_row;
+		$this->iterate();
+	}
+	
+	public function viewtopic_modify_post_row($event) {
+		$this->iterate();
+	}
+	
+	public function search_modify_tpl_ary($event) {
+		$this->iterate();
+	}
+	
+	public function iterate() {
+		$this->iterator = $this->iterator + 1;
+		if($this->iterator >= $this->end) {
+			unset($this->iterator);
+		}
 	}
 	
 	public function modify_format_display_text_after($event) {
@@ -85,28 +186,9 @@ class listener implements EventSubscriberInterface
 		$event['text'] = $text;
 	}
 	
-	public function search_modify_rowset($event) {
-		$this->hilit = $event['hilit'];
-	}
-	
-	public function search_modify_tpl_ary($event) {
-		$tpl_ary = $event['tpl_ary'];
-		$message = $tpl_ary['MESSAGE'];
-		if($this->hilit == "hide") {
-			$message = str_replace('<span class="posthilit">hide</span>', 'hide', $message);
-		}
-		$message = preg_replace('@\[hide(|\=(<span class="posthilit">([0-9,]+)</span>)(|\|([0-9,]+)))(|'
-								.$event['row']['bbcode_uid'].')\]@', '[hide=${3}|${5}]', $message);
-		$message = preg_replace('@\[hide(|\=(|[0-9,]+)(|\|(<span class="posthilit">([0-9,]+)</span>)))(|'
-								.$event['row']['bbcode_uid'].')\]@', '[hide=${2}|${5}]', $message);
-		$this->replace_hide_bbcode_wrapper($event['row']['poster_id'], $event['row']['bbcode_uid'], $message, true);
-		$tpl_ary['MESSAGE'] = $message;
-		$event['tpl_ary'] = $tpl_ary;
-	}
-	
 	public function replace_hide_bbcode_wrapper($user_id, $bbcode_uid, &$message, $decoded) {
 		$this->current_row['user_id'] = $user_id;
-		$this->current_row['regex']['open_tag'] = "@\[hide(|\=(|[0-9,]+)(|\||\|([0-9,]+)))(|:". $bbcode_uid .")\]@is";
+		$this->current_row['regex']['open_tag'] = "@\[hide(|\=(|[0-9,]+)(|\|([0-9,]+)))(|:". $bbcode_uid .")\]@is";
 		$this->current_row['regex']['close_tag'] = "@\[/hide(|:". $bbcode_uid .")\]@is";
 		if(preg_match_all($this->current_row['regex']['open_tag'], $message, $open_matches, PREG_OFFSET_CAPTURE)
 		&& preg_match_all($this->current_row['regex']['close_tag'], $message, $close_matches, PREG_OFFSET_CAPTURE))
