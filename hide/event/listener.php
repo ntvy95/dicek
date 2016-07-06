@@ -91,17 +91,23 @@ class listener implements EventSubscriberInterface
 	
 	public function search_modify_rowset($event) {
 		$this->post_list = array();
-		$rowset = $event['rowset'];
-		if(isset($rowset[0]['post_id'])) {
+		if($event['show_results'] == 'posts') {
+			$rowset = $event['rowset'];
 			$i = 0;
-			foreach ($rowset as $row)
+			foreach ($rowset as &$row)
 			{
-				$this->post_list[$i] = $row['poster_id'];
-				$i = $i + 1;
+				if($row['display_text_only']) {
+					$this->replace_hide_bbcode_wrapper($row['poster_id'], $row['bbcode_uid'], $row['post_text'], true);
+				}
+				else {
+					$this->post_list[$i] = $row['poster_id'];
+					$i = $i + 1;
+				}
 			}
 			$this->iterator = 0;
-			$this->end = count($rowset);
+			$this->end = $i;
 			$this->decoded = true;
+			$event['rowset'] = $rowset;
 		}
 	}
 	
