@@ -24,10 +24,13 @@ class listener implements EventSubscriberInterface
 	protected $iterator;
 	protected $end;
 	protected $user;
+	protected $reg_pattern;
 
 	public function __construct(\phpbb\user $user)
 	{
 		$this->user = $user;
+		$this->reg_pattern['style'] = '@\[style\=([^,\]\{\}]+)\]([^\[\{\}]+)\[/style\]@ius';
+		$this->reg_pattern['style_animation'] = '%\[style\=@([^,\]\{\}]+)\]([^\[]+)\[/style\]%ius';
 	}
 
 	static public function getSubscribedEvents()
@@ -100,13 +103,41 @@ class listener implements EventSubscriberInterface
 	}
 	
 	public function modify_text_for_display_after($event) {
+		$event['text'] = $this->rep_bbcode_style_wrapper($event['text']);
 		if(isset($this->iterator)) {
 			$event['text'] = str_replace("-_USERID_-", $this->post_list[$this->iterator], $event['text']);
 		}
 	}
 	
 	public function modify_format_display_text_after($event) {
+		$event['text'] = $this->rep_bbcode_style_wrapper($event['text']);
 		$event['text'] = str_replace("-_USERID_-", $this->user->data['user_id'], $event['text']);
+	}
+	
+	public function rep_bbcode_style_wrapper($text) {
+		$text = preg_replace_callback($this->reg_pattern['style_animation'], function ($matches) {
+			return $this->rep_bbcode_style($matches, 1);
+		}, $text);
+		$text = preg_replace_callback($this->reg_pattern['style'], function ($matches) {
+			return $this->rep_bbcode_style($matches, 0);
+		}, $text);
+		return $text;
+	}
+	
+	public function rep_bbcode_style($matches, $type) {
+		switch($type) {
+			case 0:
+				return '<style type="text/css"> .user_-_USERID_-_ ' . $matches[1] . ' {' . str_replace('<br />', '', $matches[2]) . '} </style>';
+				break;
+			case 1:
+				if(substr_count($matches[2], '{') - substr_count($matches[2], '}') == 0) {
+					return '<style type="text/css">@' . $matches[1] . ' {' . str_replace('<br />', '', $matches[2]) . '} </style>';
+				}
+				else {
+					return $matches[0];
+				}
+				break;
+		}
 	}
 	
 	public function iterate() {

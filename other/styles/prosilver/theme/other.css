@@ -1,7 +1,5 @@
 .spoiler_show {
-	max-height: 9999999px;
 }
 .spoiler_hide {
-	max-height: 0;
-	overflow: hidden;
+	display: none;
 }
