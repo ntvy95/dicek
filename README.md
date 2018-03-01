@@ -22,9 +22,9 @@ Result:
 
 # Example
 
-[dicek]10-20-30-20[/dicek] => 8-11-25-5
+`[dicek]10-20-30-20[/dicek]` => `8-11-25-5`
 
-[dicek]3[/dicek] => 2
+`[dicek]3[/dicek]` => `2`
 
 ## Note
 
