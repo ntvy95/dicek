@@ -30,16 +30,12 @@ Result:
 
 Once you submit the post with [dicek]10-20-30-20[/dicek], you can later edit the post into:
 
-`First dicek with 30 max: [dicek]30[/dicek]
-
-First dicek with 20 max: [dicek]20[/dicek]
-
-Second dicek with 20 max: [dicek]20[/dicek]`
+> First dicek with 30 max: [dicek]30[/dicek]
+> First dicek with 20 max: [dicek]20[/dicek]
+> Second dicek with 20 max: [dicek]20[/dicek]
 
 So the result will be:
 
-`First dicek with 30 max: 25
-
-First dicek with 20 max: 11
-
-Second dicek with 20 max: 5`
+> First dicek with 30 max: 25
+> First dicek with 20 max: 11
+> Second dicek with 20 max: 5
