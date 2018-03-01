@@ -1,7 +1,0 @@
-services:
-    koutogima.copy.event.main_listener:
-        class: koutogima\copy\event\main_listener
-        arguments:
-            - @request
-        tags:
-            - { name: event.listener }
