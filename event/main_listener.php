@@ -1,6 +1,6 @@
 <?php
 
-namespace koutogima\dicek\event;
+namespace ntvy95\dicek\event;
 
 /**
 * @ignore
