@@ -15,16 +15,31 @@ The difference: My extension saves the dice result into the database so that the
 # Syntax
 
 `[dicek]max1-max2-max3-...-maxn[/dicek]`
+`[checkdicek]post_id[/checkdicek]`
 
 Result:
 
 `[a random number from 1 to max1]-[a random number from 1 to max2]-...-[a random number from 1 to maxn]`
+
+```
+POST ID: post_id
+Dice Range: max1-max2-max3-...-maxn
+Corresponding Dice Result: [a random number from 1 to max1]-[a random number from 1 to max2]-...-[a random number from 1 to maxn]
+```
 
 # Example
 
 `[dicek]10-20-30-20[/dicek]` => `8-11-25-5`
 
 `[dicek]3[/dicek]` => `2`
+
+`[checkdicek]3[/checkdicek]` =>
+
+```
+POST ID: 3
+Dice Range: 10-20-30-20
+Corresponding Dice Result: 8-11-25-5
+```
 
 ## Note
 
