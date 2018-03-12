@@ -15,6 +15,7 @@ The difference: My extension saves the dice result into the database so that the
 # Syntax
 
 `[dicek]max1-max2-max3-...-maxn[/dicek]`
+
 `[checkdicek]post_id[/checkdicek]`
 
 Result:
