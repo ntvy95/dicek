@@ -264,7 +264,7 @@ class main_listener implements EventSubscriberInterface
 			array_push($dicek_value, $post_dicek[$range][$dicek_range_index[$range]]);
 			$dicek_range_index[$range] = $dicek_range_index[$range] + 1;
 		}
-		return '<a target="_blank" href="checkdicek.php?post_id=' . $post_id . '">' . $this->convert_dicek_array_to_string($dicek_value) . '</a>';
+		return $this->convert_dicek_array_to_string($dicek_value);
 	}
 	
 	public function bb_checkdicek_replace($post_id, $current_post_id) {
